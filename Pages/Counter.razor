@@ -1,4 +1,7 @@
-﻿@page "/counter"
+﻿@page "/counter/{initialCount?}" // El signo ? hace que no sea obligatorio poner el parámetro
+@inject ILogger<Counter> logger; // Así se inyectan dependencias ya establecidas en el Program.cs
+
+
 
 <PageTitle>Counter</PageTitle>
 
@@ -10,6 +13,42 @@
 
 @code {
     private int currentCount = 0;
+
+    [Parameter]
+    public string? initialCount { get;set; } // Se inicializa con el data annotation "Parameter", se usa el signo "?" si también se usó en la declaración inicial
+
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        if (parameters.TryGetValue<string>("initialCount", out var value))
+        {
+            if (value is not null)
+            {
+                initialCount = value;
+            }   
+        }
+
+        await base.SetParametersAsync(parameters);
+    }
+
+    protected override void OnInitialized()
+    {
+        currentCount = initialCount != null ? int.Parse(initialCount) : 0;
+        logger.LogInformation("Se inicializa el componente");
+        base.OnInitialized();
+    }
+
+    protected override void OnParametersSet()
+    {
+        logger.LogInformation("Se envían los parámetros");
+        base.OnParametersSet();
+    }
+
+    protected override void OnAfterRender(bool firstRender) // Todas las funciones se ejecutan en ese orden
+    {
+        logger.LogInformation("Esto ocurre después de inicializado el componente");
+        base.OnAfterRender(firstRender);
+    }
 
     private void IncrementCount()
     {
