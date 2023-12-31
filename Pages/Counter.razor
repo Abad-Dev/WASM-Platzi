@@ -15,11 +15,11 @@
     private int currentCount = 0;
 
     [Parameter]
-    public string? initialCount { get;set; } // Se inicializa con el data annotation "Parameter", se usa el signo "?" si también se usó en la declaración inicial
+    public string initialCount { get;set; } // Se inicializa con el data annotation "Parameter", se usa el signo "?" si también se usó en la declaración inicial
 
     [Parameter]
     [SupplyParameterFromQuery] // Así se obtiene un parámetro de un query string
-    public string? CounterFromQuery { get;set; }
+    public string CounterFromQuery { get;set; }
 
 
     public override async Task SetParametersAsync(ParameterView parameters)

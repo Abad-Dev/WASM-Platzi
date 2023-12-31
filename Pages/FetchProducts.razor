@@ -1,0 +1,47 @@
+@page "/products"
+@using WASM_Platzi.Models
+@inject IProductService ProductService
+
+@if (products?.Count > 0)
+{
+    <div class="products-container">
+        @foreach (Product product in products)
+        {
+            <div class="card">
+                <img class="card-img-top" src="@product.Image" alt="Product" loading="lazy" width = "270" height="210">
+                <div class="card-body">
+                    <h5><b>@product.Title</b></h5>
+                    <p>@product.Price.ToString("C")</p>
+                </div> 
+            </div>
+        }
+    </div>
+}else 
+{
+    <div class="d-flex justify-content-center">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+}
+@code {
+    private List<Product> products;
+
+    protected override async Task OnInitializedAsync()
+    {
+        products = await ProductService.GetProductsAsync();
+    }
+}
+
+<style>
+    .products-container{
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .card{
+        width: 200px;
+        margin: 15px
+    }
+</style>
