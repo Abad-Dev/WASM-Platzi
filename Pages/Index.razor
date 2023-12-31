@@ -1,9 +1,21 @@
 ﻿@page "/"
+@inject IConfiguration config
 
 <PageTitle>Index</PageTitle>
 
-<h1>Hello, world Platzi!</h1>
+<h1>@helloMessage!</h1>
 
 Welcome to your new app.
 
 <SurveyPrompt Title="How is Blazor working for you?" />
+
+@code 
+{
+    public string helloMessage = "";
+
+    protected override void OnInitialized()
+    {
+        helloMessage = config["helloMessage"];
+        base.OnInitialized();
+    }
+}

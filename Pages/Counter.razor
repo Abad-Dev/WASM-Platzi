@@ -5,7 +5,7 @@
 
 <PageTitle>Counter</PageTitle>
 
-<h1>Counter</h1>
+<ModuleTitle Color="blue">Counter</ModuleTitle>
 
 <p role="status">Current count: @currentCount</p>
 
@@ -16,6 +16,10 @@
 
     [Parameter]
     public string? initialCount { get;set; } // Se inicializa con el data annotation "Parameter", se usa el signo "?" si también se usó en la declaración inicial
+
+    [Parameter]
+    [SupplyParameterFromQuery] // Así se obtiene un parámetro de un query string
+    public string? CounterFromQuery { get;set; }
 
 
     public override async Task SetParametersAsync(ParameterView parameters)
@@ -33,7 +37,8 @@
 
     protected override void OnInitialized()
     {
-        currentCount = initialCount != null ? int.Parse(initialCount) : 0;
+        currentCount = initialCount != null ? int.Parse(initialCount) : 
+                    CounterFromQuery != null ? int.Parse(CounterFromQuery) : 0;
         logger.LogInformation("Se inicializa el componente");
         base.OnInitialized();
     }

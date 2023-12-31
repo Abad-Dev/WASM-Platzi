@@ -1,0 +1,13 @@
+<u>
+    <h1 style="color: @Color;">
+        @ChildContent
+    </h1>
+</u>
+
+@code{
+    [Parameter]
+	public RenderFragment ChildContent { get;set; } = (builder) => builder.AddContent(0, "");
+
+    [Parameter]
+    public string Color { get;set; } = "#000000";
+}
