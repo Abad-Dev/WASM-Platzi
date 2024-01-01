@@ -13,14 +13,16 @@ public class ProductService : IProductService
         options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
     }
 
-    public async Task<List<Product>> GetProductsAsync()
+    public async Task<List<Product>> GetProductsAsync(string productLimit)
     {
-        var response = await _client.GetAsync("products?limit=5");
+        var response = await _client.GetAsync("products?limit="+productLimit);
         return await JsonSerializer.DeserializeAsync<List<Product>>(await response.Content.ReadAsStreamAsync(), options);
     }
+
+    
 }
 
 public interface IProductService
 {
-    public Task<List<Product>> GetProductsAsync();
+    public Task<List<Product>> GetProductsAsync(string productLimit);
 }

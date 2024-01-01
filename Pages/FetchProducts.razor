@@ -2,6 +2,14 @@
 @using WASM_Platzi.Models
 @inject IProductService ProductService
 
+<h1>Productos:</h1>
+<div class="d-flex align-items-center">
+    <p>Mostrando</p>
+    <input type="number" class="form-control py-2 mx-2 text-center" style="max-width: 55px;" @bind="@productLimit" @oninput="@((e) => { productLimit=(string)e.Value; })">
+    <p>elementos</p>
+    <button class="btn btn-primary" @onclick="ReloadProds">Mostrar</button>
+</div>
+
 @if (products?.Count > 0)
 {
     <div class="products-container">
@@ -25,15 +33,31 @@
     </div>
 }
 @code {
-    private List<Product> products;
+    private string productLimit = "5";
+    private List<Product> products = new List<Product>{ }; // La lista se inicializa vacía ya que solo se modifica su interior
 
     protected override async Task OnInitializedAsync()
     {
-        products = await ProductService.GetProductsAsync();
+        await ReloadProds();
     }
+
+    private async Task ReloadProds()
+    {
+        products.Clear(); // Primero se limpia para que salga el cargando
+        var newProds = await GetProducts(productLimit); // Luego el código espera a que obtenga los productos
+        products.AddRange(newProds); // Y los llena en la lista
+    }
+
+    private async Task<List<Product>> GetProducts(string productLimit)
+    {        
+        return await ProductService.GetProductsAsync(productLimit);
+    }   
 }
 
 <style>
+    p{
+        margin: 0;
+    }
     .products-container{
         display: flex;
         flex-wrap: wrap;
