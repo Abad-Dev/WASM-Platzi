@@ -14,7 +14,7 @@ public class CategoryService : ICategoryService
 
         public async Task<List<Category>> Get()
         {
-            var response = await client.GetAsync("v1/categories");
+            var response = await client.GetAsync("categories");
             var content = await response.Content.ReadAsStringAsync();
             if (!response.IsSuccessStatusCode)
             {
@@ -27,5 +27,5 @@ public class CategoryService : ICategoryService
 
 public interface ICategoryService
 {
-    Task<List<Category>> Get();
+    public Task<List<Category>> Get();
 }

@@ -12,20 +12,56 @@
             <button class="btn btn-primary" @onclick="@(() => navigationManager.NavigateTo("/products"))">Atrás</button>
         </div>
     </div>
-    <EditForm Model="@newProduct">
+    <EditForm Model="@newProduct" OnSubmit="@Save">
         <div class="row">
             <div class="col-8 form-group">
                 <label for="title">Nombre</label>
                 <InputText id="title" @bind-Value="newProduct.Title" required class="form-control"/> 
             </div>
-            <div class="col-4">
-
+            <div class="col form-group">
+                <label for="price">Price</label>
+                <InputNumber id="price" @bind-Value="newProduct.Price" type="number" required class="form-control" />
             </div>
         </div>
+        <div class="row">
+            <div class="col form-group">
+                <label for="category">Category</label>
+                <InputSelect id="category" @bind-Value="newProduct.CategoryId" required class="form-control">
+                    <option>Select Category...</option>
+                    @foreach (Category category in categories)
+                    {
+                        <option value="@category.Id">@category.Name</option>
+                    }
+                </InputSelect>
+            </div>
+            <div class="col form-group">
+                <label for="image">Image (Url)</label>
+                <InputText id="image" @bind-Value="newProduct.Image" required class="form-control" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group">
+                <label for="description">Description</label>
+                <InputTextArea id="description" required @bind-Value="newProduct.Description" class="form-control"></InputTextArea>
+            </div>
+        </div>
+        <hr />
+        <button class="btn btn-primary" type="submit">Save</button>
     </EditForm>
 </div>
 
 @code
 {
     private Product newProduct = new();
+    private List<Category> categories = new List<Category>();
+    protected override async Task OnInitializedAsync()
+    {
+        categories = await categoryService.Get();
+    }
+    private async Task Save()
+    {
+        newProduct.Images = new string[1] { newProduct.Image };
+        await productService.Add(newProduct);
+        navigationManager.NavigateTo("/products");
+    }
 }
