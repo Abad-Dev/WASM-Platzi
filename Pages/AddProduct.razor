@@ -1,0 +1,31 @@
+@page "/addproduct"
+@inject IProductService productService;
+@inject ICategoryService categoryService;
+@inject NavigationManager navigationManager;
+
+<PageTitle>Add New Product</PageTitle>
+
+<h1>Crear Nuevo Producto:</h1>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12 d-flex justify-content-end">
+            <button class="btn btn-primary" @onclick="@(() => navigationManager.NavigateTo("/products"))">Atrás</button>
+        </div>
+    </div>
+    <EditForm Model="@newProduct">
+        <div class="row">
+            <div class="col-8 form-group">
+                <label for="title">Nombre</label>
+                <InputText id="title" @bind-Value="newProduct.Title" required class="form-control"/> 
+            </div>
+            <div class="col-4">
+
+            </div>
+        </div>
+    </EditForm>
+</div>
+
+@code
+{
+    private Product newProduct = new();
+}
