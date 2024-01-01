@@ -3,6 +3,7 @@
 @using WASM_Platzi.Models;
 @inject IProductService ProductService;
 @inject NavigationManager navigationManager;
+@inject IJSRuntime JSRuntime;
 
 <h1>Productos:</h1>
 <div class="row">
@@ -20,6 +21,7 @@
                 <div class="card-body">
                     <h5><b>@product.Title</b></h5>
                     <p>@product.Price.ToString("C", provider)</p>
+                    <button title="Delete" class="btn btn-danger btn-delete" @onclick="@(() => DeleteProduct(product))"><span class="oi oi-trash"></span></button>
                 </div> 
             </div>
         }
@@ -33,8 +35,8 @@
     </div>
 }
 @code {
-    CultureInfo provider = new CultureInfo("en-us"); 
-    private List<Product> products = new List<Product>{ }; // La lista se inicializa vacía ya que solo se modifica su interior
+    CultureInfo provider = new CultureInfo("en-us"); // Precio en $ y no euros
+    private List<Product> products = new List<Product>{ }; // La lista se inicializa vacía ya que solo se modifica su contenido
 
     protected override async Task OnInitializedAsync()
     {
@@ -52,6 +54,15 @@
     {        
         return await ProductService.GetProductsAsync();
     }   
+
+    private async Task DeleteProduct(Product product)
+    {
+        if (!await JSRuntime.InvokeAsync<bool>("confirm", $"Estás seguro que quieres borrar {product.Title}?" ))
+            return;
+        
+        await ProductService.Delete(product.Id);
+        await ReloadProds();
+    }
 }
 
 <style>

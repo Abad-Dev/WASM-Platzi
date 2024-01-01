@@ -6,18 +6,12 @@ namespace WASM_Platzi.Services;
 public class ProductService : IProductService
 {
     private readonly HttpClient _client;
-    private readonly JsonSerializerOptions options; 
-    public List<Product> AddedProducts = new() {};
+    private readonly JsonSerializerOptions options;
 
     public ProductService( HttpClient httpClient)
     {
         _client = httpClient;
         options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-    }
-
-    public List<Product> GetAddedProducts()
-    {
-        return AddedProducts;
     }
 
     public async Task<List<Product>> GetProductsAsync()
@@ -28,21 +22,28 @@ public class ProductService : IProductService
 
     public async Task Add(Product product)
     {
-        // Esta es la lógica que seguiría normalmente
         var response = await _client.PostAsync("products", JsonContent.Create(product));
         var content = await response.Content.ReadAsStringAsync();
         if (!response.IsSuccessStatusCode)
         {
             throw new ApplicationException(content);
         }
-        // Esta es solo para que lo vea el usuario
-        AddedProducts.Add(product);
+    }
+
+    public async Task Delete(int productId)
+    {
+        var response = await _client.DeleteAsync($"products/{productId}");
+        var content = await response.Content.ReadAsStringAsync();
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new ApplicationException(content);
+        }
     }
 }
 
 public interface IProductService
 {
-    public List<Product> GetAddedProducts();
     public Task<List<Product>> GetProductsAsync();
     public Task Add(Product product);
+    public Task Delete(int productId);
 }
