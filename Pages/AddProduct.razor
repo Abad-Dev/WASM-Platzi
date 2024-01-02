@@ -20,7 +20,7 @@
             </div>
             <div class="col form-group">
                 <label for="price">Price</label>
-                <InputNumber id="price" @bind-Value="newProduct.Price" type="number" required class="form-control" />
+                <InputNumber id="price" @bind-Value="newProduct.Price" type="number" min="1" required class="form-control" />
             </div>
         </div>
         <div class="row">

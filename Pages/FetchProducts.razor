@@ -1,9 +1,10 @@
 @page "/products";
 @using System.Globalization; 
 @using WASM_Platzi.Models;
-@inject IProductService ProductService;
+@inject IProductService productService;
 @inject NavigationManager navigationManager;
 @inject IJSRuntime JSRuntime;
+@inject IToastService toastService;
 
 <h1>Productos:</h1>
 <div class="row">
@@ -52,7 +53,7 @@
 
     private async Task<List<Product>> GetProducts()
     {        
-        return await ProductService.GetProductsAsync();
+        return await productService.GetProductsAsync();
     }   
 
     private async Task DeleteProduct(Product product)
@@ -60,7 +61,8 @@
         if (!await JSRuntime.InvokeAsync<bool>("confirm", $"Estás seguro que quieres borrar {product.Title}?" ))
             return;
         
-        await ProductService.Delete(product.Id);
+        await productService.Delete(product.Id);
+        toastService.ShowSuccess("Producto eliminado correctamente");
         await ReloadProds();
     }
 }
