@@ -3,11 +3,34 @@
 
 <PageTitle>Index</PageTitle>
 
-<h1>@helloMessage!</h1>
+<ModuleTitle Color="rgba(255,110,95,1)">
+    @helloMessage!
+</ModuleTitle>
 
-Welcome to your new app.
+<p>
+    Bienvenido a mi proyecto con Blazor Wasm
+</p>
+<p>
+    Probablemente vengas del repositorio de Github, sino, aquí puedes ir a él:
+</p>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+<a href="https://github.com/Abad-Dev/WASM-Platzi" target="_blank">
+    <div class="alert alert-dark d-flex align-items-center justify-content-center" role="alert" style="max-width: 600px;">
+        <iconify-icon icon="mdi:github" style="height: 100%; width: auto"></iconify-icon>WASM-Platzi
+    </div>
+</a>
+
+<p>
+    Este proyecto es un ejemplo básico de un CRUD, donde en la sección 
+    <div class="nav-item px-3" style="background-color: rgb(192, 192, 192); padding: 10px 5px; border-radius: 5px; max-width: 200px;">
+        <NavLink class="nav-link ps-2" href="products">
+            <span class="oi oi-basket" aria-hidden="true"></span> Products
+        </NavLink>
+    </div>
+    Consumimos la <a href="https://fakeapi.platzi.com/" target="_blank">Platzi Fake Store API</a>
+    para conseguir todas las funcionalidades de un CRUD
+</p>
+
 
 @code 
 {

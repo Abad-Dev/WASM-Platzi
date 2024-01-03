@@ -107,3 +107,11 @@ input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
+
+
+
+@media (min-width: 641px) {
+    .collapse:not(.show){
+        display: block !important;
+    } 
+}

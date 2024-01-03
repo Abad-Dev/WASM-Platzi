@@ -1,8 +1,8 @@
-<u>
-    <h1 style="color: @Color;">
-        @ChildContent
-    </h1>
-</u>
+<div class="two">
+  <h1>
+    @ChildContent
+  </h1>
+</div>
 
 @code{
     [Parameter]
@@ -11,3 +11,20 @@
     [Parameter]
     public string Color { get;set; } = "#000000";
 }
+
+<style>
+    .two h1 {
+        position: relative;
+        font-family: 'Raleway', sans-serif;
+        text-transform: capitalize;
+    }
+    .two h1:before {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 60px;
+        height: 2px;
+        content: "";
+        background-color: @Color;
+    }
+</style>

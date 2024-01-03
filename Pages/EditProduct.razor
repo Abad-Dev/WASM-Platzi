@@ -1,0 +1,87 @@
+@page "/editproduct/{productId}"
+@inject IProductService productService;
+@inject ICategoryService categoryService;
+@inject NavigationManager navigationManager;
+
+<PageTitle>Edit Product</PageTitle>
+
+<h1>Editar Producto:</h1>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12 d-flex justify-content-end">
+            <button class="btn btn-primary" @onclick="@(() => navigationManager.NavigateTo("/products"))">Atrás</button>
+        </div>
+    </div>
+    <EditForm Model="@newProduct" OnSubmit="@Save">
+        <div class="row">
+            <div class="col-8 form-group">
+                <label for="title">Nombre</label>
+                <InputText id="title" @bind-Value="newProduct.Title" required class="form-control"/> 
+            </div>
+            <div class="col form-group">
+                <label for="price">Price</label>
+                <InputNumber id="price" @bind-Value="newProduct.Price" type="number" min="1" required class="form-control" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col form-group">
+                <label for="category">Category</label>
+                <InputSelect id="category" @bind-Value="newProduct.CategoryId" required class="form-control" disabled>
+                    <option>Select Category...</option>
+                    @foreach (Category category in categories)
+                    {
+                        <option value="@category.Id">@category.Name</option>
+                    }
+                </InputSelect>
+            </div>
+            <div class="col form-group">
+                <label for="image">Image (Url)</label>
+                <InputText id="image" @bind-Value="newProduct.Image" required class="form-control" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group">
+                <label for="description">Description</label>
+                <InputTextArea id="description" required @bind-Value="newProduct.Description" class="form-control"></InputTextArea>
+            </div>
+        </div>
+        <hr />
+        <button class="btn btn-primary" type="submit">Save</button>
+    </EditForm>
+</div>
+
+@code
+{
+    private Product newProduct = new();
+
+    [Parameter]
+    public string productId { get;set; }
+    private List<Category> categories = new List<Category>();
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        if (parameters.TryGetValue<string>("productId", out var value))
+        {
+            if (value is not null)
+            {
+                productId = value;
+            }   
+        }
+
+        await base.SetParametersAsync(parameters);
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        Product dbProduct = await productService.GetProductByIdAsync(productId);
+        newProduct = dbProduct;
+        newProduct.Image = dbProduct.Images[0];
+        newProduct.CategoryId = dbProduct.Category.Id;
+        categories = await categoryService.Get();
+    }
+    private async Task Save()
+    {
+        newProduct.Images = new string[1] { newProduct.Image };
+        await productService.Update(productId, newProduct);
+        navigationManager.NavigateTo("/products");
+    }
+}
