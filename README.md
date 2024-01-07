@@ -32,26 +32,84 @@ Esta página aprovecha todos los recursos aprendidos en el curso, como por ejemp
 Estos 3 componentes usan el Componente compartido [ModuleTitle](Shared/ModuleTitle.razor) en la carpeta Shared. <br>
 Además usan un atributo `Color` el cual se inserta los estilos para colorear el `::before` del título.
 
-### Counter
-En la sección de Counter, usé los [***Life cycles***](https://learn.microsoft.com/en-us/aspnet/core/blazor/components/lifecycle?view=aspnetcore-8.0) para inicializar la cuenta de un contador.
+## Products
+La sección de Products es un CRUD que demuestra las habilidades adquiridas con BlazorWasm:
+
+### Create 
+En la sección de Products, hay un botón para agregar un nuevo Producto.
+<p align="center">
+    <img src="Images/btn-create.png">
+</p>
+
+Ese botón redirige a un formulario, hecho con el componente ***EditForm***:
+<p align="center">
+    <img src="Images/create-form.png">
+</p>
+
+El botón guardar invoca al servicio `ProductService`, el cual se encarga de hacer la petición y guardar el producto en la api, luego, con la clase `NavigationManager` se redirige a la sección de productos nuevamente.
+
+[AddProduct.razor](Pages/AddProduct.razor)
+```c#
+    private async Task Save()
+    {
+        newProduct.Images = new string[1] { newProduct.Image };
+        await productService.Add(newProduct);
+        navigationManager.NavigateTo("/products");
+    }
+```
+
+### Read
+
+
+### Update
+Cada Producto tiene un botón para editarlo:
+<p align="center">
+    <img src="Images/edit-btn.png">
+</p>
+
+Este botón redirige mediante un `NavLink` a una página para editar el producto, donde se le envía el id del producto mediante la url.
+
+En esta página, utilicé los [***Life cycles***](https://learn.microsoft.com/en-us/aspnet/core/blazor/components/lifecycle?view=aspnetcore-8.0) para obtener el id del parametro de la URL:
 <p align="center">
     <img src="Images/lifecycle1.png" >
 </p>
 
-https://jm-delivery.com/counter?CounterFromQuery=256
+El parámetro se recibe en la variable `productId`, y se inicializa en la función `SetParametersAsync`:
 
-La cuenta se inicializa con el queryString `CounterFromQuery`, el cual recibe en el parámetro `CounterFromQuery` y se inicializa en la función `OnInitialized()`:
-
-[Counter.razor](Pages/Counter.razor)
+[EditProduct.razor](Pages/EditProduct.razor)
 ```c#
-    private int currentCount = 0;
+    private Product newProduct = new();
 
     [Parameter]
-    [SupplyParameterFromQuery]
-    public string CounterFromQuery { get;set; }
+    public string productId { get;set; }
+    private List<Category> categories = new List<Category>();
 
-    protected override void OnInitialized()
+    public override async Task SetParametersAsync(ParameterView parameters)
     {
-        currentCount = CounterFromQuery != null ? int.Parse(CounterFromQuery) : 0;
+        if (parameters.TryGetValue<string>("productId", out var value))
+        {
+            if (value is not null)
+            {
+                productId = value;
+            }   
+        }
+
+        await base.SetParametersAsync(parameters);
     }
 ```
+
+Luego, en la función `OnInitializedAsync` se hace uso del servicio `ProductService` para extraer de la API el producto y sus atributos:
+
+```c#
+    protected override async Task OnInitializedAsync()
+    {
+        Product dbProduct = await productService.GetProductByIdAsync(productId);
+
+        newProduct = dbProduct;
+        newProduct.Image = dbProduct.Images[0];
+        newProduct.CategoryId = dbProduct.Category.Id;
+        categories = await categoryService.Get();
+    }
+```
+
+### Delete
