@@ -59,7 +59,59 @@ El botón guardar invoca al servicio `ProductService`, el cual se encarga de hac
 ```
 
 ### Read
+Para traer todos los productos de la API, se usa el método `GetProductsAsync()` del servicio `ProductService` y se agregan en la lista vacía `products`:
 
+[FetchProducts.razor](Pages/FetchProducts.razor)
+```c#
+    CultureInfo provider = new CultureInfo("en-us");
+    private List<Product> products = new List<Product>{ };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ReloadProds();
+    }
+
+    private async Task ReloadProds()
+    {
+        products.Clear();
+        var newProds = await GetProducts();
+        products.AddRange(newProds);
+    }
+
+    private async Task<List<Product>> GetProducts()
+    {        
+        return await productService.GetProductsAsync();
+    }   
+```
+
+El método `ReloadProds()` vacía la lista y vuelve a hacer la petición para volver a llenar la lista, es el método que se llama en la primera llamada a la página.
+
+Una vez con la lista llena, se mapea con ciclo `foreach`:
+
+```c#
+@foreach (Product product in products)
+{
+    <div class="card-container">   
+        <div class="card">
+            <img class="card-img-top" src="@product.Images[0]" alt="Product" loading="lazy" width = "270" height="210">
+            <div class="card-body">
+                <h5><b>@product.Title</b></h5>
+                <p>@product.Price.ToString("C", provider)</p>
+                <NavLink href="@($"editproduct/{product.Id}")">
+                    <button title="edit" class="btn btn-primary">
+                        <span class="oi oi-pencil"></span>
+                    </button>
+                </NavLink>
+                
+                <button title="Delete" class="btn btn-danger btn-delete" @onclick="@(() => DeleteProduct(product))">
+                    <span class="oi oi-trash"></span>
+                </button>
+                <p>From: @product.Category.Name</p>
+            </div> 
+        </div>
+    </div>
+}
+```
 
 ### Update
 Cada Producto tiene un botón para editarlo:
@@ -112,4 +164,59 @@ Luego, en la función `OnInitializedAsync` se hace uso del servicio `ProductServ
     }
 ```
 
+Una vez la variable se haya inicializado con sus atributos, es recibido en el formulario para ser editado:
+<p align="center">
+    <img src="Images/edit-form.png" >
+</p>
+
+Finalmente, el botón **Save** invoca una función que usa el servicio `ProductService` para guardar los cambios del producto:
+
+```c#
+private async Task Save()
+{
+    newProduct.Images = new string[1] { newProduct.Image };
+    await productService.Update(productId, newProduct);
+    navigationManager.NavigateTo("/products");
+}
+```
+
 ### Delete
+Cada producto tiene un botón para borrarlo:
+<p align="center">
+    <img src="Images/delete-btn.png" >
+</p>
+
+Este botón invoca una función de JavaScript que viene en el servicio `JSRuntime`, el cual nos permite invocar funciones de JavaScript en .NET:
+
+[FetchProducts.razor](Pages/FetchProducts.razor)
+```C#
+<button 
+    title="Delete" 
+    class="btn btn-danger btn-delete" 
+    @onclick="@(() => DeleteProduct(product))">
+    <span class="oi oi-trash"></span>
+</button>
+```
+
+```C#
+private async Task DeleteProduct(Product product)
+{
+    if (!await JSRuntime.InvokeAsync<bool>("confirm", $"Estás seguro que quieres borrar {product.Title}?" ))
+        return;
+    
+    await productService.Delete(product.Id);
+    toastService.ShowSuccess("Producto eliminado correctamente");
+    await ReloadProds();
+}
+```
+
+La función le consulta al usuario si está seguro de borrar el producto seleccionado:
+<p align="center">
+    <img src="Images/delete-js.png" >
+</p>
+
+Luego de ser borrado el producto, se implementa la librería [**Blazored Toast**](https://github.com/Blazored/Toast) par mostrar un mensaje en pantalla para informar al usuario que el producto ha sido borrado correctamente:
+<p align="center">
+    <img src="Images/delete-toast.png" >
+</p>
+
